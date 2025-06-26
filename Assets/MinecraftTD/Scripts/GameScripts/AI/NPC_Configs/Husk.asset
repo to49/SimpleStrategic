@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36319d5464ff3404d8dae5f19026f2f2, type: 3}
-  m_Name: Zombie
+  m_Name: Husk
   m_EditorClassIdentifier: 
   enableIdle: 1
   enableWalk: 1
   enableAttackMelee: 1
   enableAttackRange: 0
-  damage: 3
+  damage: 5
   attackCooldown: 1
   attackRangeDistance: 5
   ProjectilePrefab: {fileID: 0}

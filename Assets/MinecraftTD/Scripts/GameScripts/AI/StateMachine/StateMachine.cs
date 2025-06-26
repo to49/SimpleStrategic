@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 
 public class StateMachine
-{
+{ 
     private FsmState StateCurrent { get; set; }
     public FsmState CurrentState => StateCurrent;
-    
     private Dictionary<Type, FsmState> _states = new Dictionary<Type, FsmState>();
-
+    private FsmAgentExample _fsmAgent;
+    public StateMachine(FsmAgentExample fsmAgent)
+    {
+        this._fsmAgent = fsmAgent;
+    }
     public void AddState(FsmState state)
     {
         _states.Add(state.GetType(), state);

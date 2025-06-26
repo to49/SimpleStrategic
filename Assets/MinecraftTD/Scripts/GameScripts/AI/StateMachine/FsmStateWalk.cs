@@ -2,7 +2,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-
 public class FsmStateWalk : FsmState
 {
     private NavMeshAgent _agent;
@@ -10,6 +9,7 @@ public class FsmStateWalk : FsmState
     private GameObject _targetGameObject;
     private AnimationController _animationController;
     private bool _isFliped = false;
+    private float _attackRangeDistance = 0.9f;
     public FsmStateWalk(global::StateMachine stateMachine, NavMeshAgent agent, AnimationController animationController,
         SpriteRenderer spriteRenderer)
         : base(stateMachine)
@@ -19,6 +19,18 @@ public class FsmStateWalk : FsmState
         _animationController = animationController;
         _isFliped = false;
     }
+    
+    public FsmStateWalk(global::StateMachine stateMachine, NavMeshAgent agent, float attackRangeDistance ,AnimationController animationController,
+        SpriteRenderer spriteRenderer)
+        : base(stateMachine)
+    {
+        _spriteRenderer = spriteRenderer;
+        _agent = agent;
+        _attackRangeDistance = attackRangeDistance;
+        _animationController = animationController;
+        _isFliped = false;
+    }
+
     
     public override void Enter()
     {
@@ -59,19 +71,29 @@ public class FsmStateWalk : FsmState
 
             float distance = Vector3.Distance(_agent.transform.position, _targetGameObject.transform.position);
 
-            if (distance < 0.9f)
+            if (distance < _attackRangeDistance)
             {
                 _agent.isStopped = true;
+                
                 var attackState = stateMachine.GetState<FsmStateAttackMelee>();
-                attackState?.SetTarget(_targetGameObject);
-                attackState?.SetFlip(_isFliped);
-                stateMachine.SetState<FsmStateAttackMelee>();
+                if (attackState != null)
+                {
+                    attackState?.SetTarget(_targetGameObject);
+                    attackState?.SetFlip(_isFliped);
+                    stateMachine.SetState<FsmStateAttackMelee>();
+                }
+                else
+                {
+                    var attackStateNew = stateMachine.GetState<FsmStateAttackRange>();
+                    attackStateNew?.SetTarget(_targetGameObject);
+                    attackStateNew?.SetFlip(_isFliped);
+                    stateMachine.SetState<FsmStateAttackRange>();
+                } // костыль, потом поправить чтоб было адекватно
             }
             else
             {
                 _agent.isStopped = false;
                 _agent.SetDestination(_targetGameObject.transform.position);
-                Debug.Log(_targetGameObject.name);
             }
         }
     }

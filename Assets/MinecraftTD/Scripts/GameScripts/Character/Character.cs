@@ -1,30 +1,32 @@
+using System;
 using UnityEngine;
-using UnityEngine.Serialization;
-
 public class Character : MonoBehaviour
 { 
-    public int healthPoint;
-    
-    private int _baseHealthPoint;
-    
-    public AnimationController animationController;
+    [SerializeField] public int healthPoint;
+    [SerializeField] private AnimationController animationController;
+    [SerializeField] private GameObject smokeEffect;
 
-    public GameObject smokeEffect;
-    
-    
+    private bool isNPC = false;
+    public event Action onTakeDamage;
     private void Start()
     {
-        _baseHealthPoint = healthPoint;
+        if (!gameObject.CompareTag("Player"))
+        {
+            isNPC = true;
+        }
     }
+    
     public void TakeDamage(int damage)
-    {
+    { 
         animationController.TakeDamageAnimation();
         healthPoint -= damage;
-        
-        Debug.Log($"{gameObject.name} получил {damage} урона! Оставшееся здоровье: {healthPoint}");
         if (healthPoint <= 0)
         {
             Death();
+        }
+        if (isNPC)
+        {
+            onTakeDamage?.Invoke();
         }
     }
 
@@ -33,6 +35,6 @@ public class Character : MonoBehaviour
         Debug.Log($"{gameObject.name} погиб!");
         GameObject smoke = Instantiate(smokeEffect, gameObject.transform.position, Quaternion.identity);
         Destroy(gameObject);
-        Destroy(smoke, 200f);
+        Destroy(smoke, 1.5f);
     }
 }

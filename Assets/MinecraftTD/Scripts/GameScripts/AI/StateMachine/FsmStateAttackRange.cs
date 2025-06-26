@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-
 
 public class FsmStateAttackRange : FsmState
 {
@@ -11,15 +9,23 @@ public class FsmStateAttackRange : FsmState
     private float _attackCooldown;
     private bool _isFliped;
     private float _timer = 0f;
-    private bool methodCalled = false;
+    private bool _methodCalled = false;
+    private Vector3 _attackPointTransform;
+    private GameObject _projectilePrefab;
+    private GameObject _creator;
+    public Projectile projectile; 
     
-    public FsmStateAttackRange(global::StateMachine stateMachine, int damage, float attackCooldown,
-        AnimationController animationController)
+    private IProjectileFactory _projectileFactory;
+    public FsmStateAttackRange(global::StateMachine stateMachine, int damage, float attackCooldown, float attackRangeDistance,
+        AnimationController animationController, GameObject projectilePrefab, IProjectileFactory projectileFactory, GameObject creator)
         : base(stateMachine)
     {
         _attackCooldown = attackCooldown;
         _damage = damage;
         _animationController = animationController;
+        _projectilePrefab = projectilePrefab;
+        _projectileFactory = projectileFactory;
+        _creator = creator;
     }
     
     public override void Enter()
@@ -41,31 +47,31 @@ public class FsmStateAttackRange : FsmState
 
         _timer += Time.deltaTime;
 
-        if (_timer >= _attackCooldown && !methodCalled && !_targetGameObject.IsDestroyed())
+        if (_timer >= _attackCooldown && !_methodCalled && !_targetGameObject.IsDestroyed())
         {
             AttackTarget();
-            methodCalled = true;
+            _methodCalled = true;
         }
 
-        if (methodCalled)
+        if (_methodCalled)
         {
             _timer = 0f;
-            methodCalled = false;
+            _methodCalled = false;
         }
     }
 
     private void AttackTarget()
     {
         Character targetHealth = _targetGameObject.GetComponent<Character>();
-
+        
         if (targetHealth != null)
         {
-            targetHealth.TakeDamage(_damage);
             _animationController.AttackAnimation(_isFliped);
-            Debug.Log($"Нанесено {_damage} урона {_targetGameObject.name}!");
+            projectile = _projectileFactory.CreateProjectile(_projectilePrefab);
+            projectile.Initialize(_damage, _targetGameObject, _creator);
         }
 
-        methodCalled = false;
+        _methodCalled = false;
     }
 
     public void SetTarget(GameObject target)

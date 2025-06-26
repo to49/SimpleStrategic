@@ -16,5 +16,7 @@ MonoBehaviour:
   enableWalk: 1
   enableAttackMelee: 1
   enableAttackRange: 0
-  damage: 1
+  damage: 2
   attackCooldown: 1
+  attackRangeDistance: 5
+  ProjectilePrefab: {fileID: 0}

@@ -15,4 +15,5 @@ public class NpcStateConfig : ScriptableObject
 
     [Tooltip("Максимальная дистанция стрельбы (используется только при включенном дальнем бою)")]
     public float attackRangeDistance = 5f;
+    public GameObject ProjectilePrefab;
 }

@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 public class FsmStateIdle : FsmState
 {
     private Transform _transform;

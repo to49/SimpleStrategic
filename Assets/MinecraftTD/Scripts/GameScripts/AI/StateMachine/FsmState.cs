@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public abstract class FsmState
 {
     protected readonly StateMachine stateMachine;

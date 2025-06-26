@@ -4,18 +4,14 @@ using UnityEngine.AI;
 public class FsmAgentExample : MonoBehaviour
 {
     private StateMachine _stateMachine;
-
-    [Header("Components")] public NavMeshAgent agent;
+    public NavMeshAgent agent;
     public AnimationController animationController;
     public SpriteRenderer spriteRenderer;
 
-    [Header("Configuration")] [SerializeField]
-    private NpcType type;
-
+    [SerializeField] private NpcType type;
     [SerializeField] private NpcStateConfig config;
-
-    [Header("Debug")] [SerializeField] private string currentState;
-
+    [SerializeField] private string currentState;
+    
     private string targetTag;
 
     private enum NpcType
@@ -23,18 +19,20 @@ public class FsmAgentExample : MonoBehaviour
         Enemy,
         Friendly
     }
-
+    
     private void Start()
     {
         if (!ValidateComponents())
             return;
 
+        gameObject.GetComponent<Character>().onTakeDamage += ChangeStateToIdle;
+        
         targetTag = type == NpcType.Enemy ? "Friendly" : "Enemy";
 
         agent.updateUpAxis = false;
         agent.updateRotation = false;
 
-        _stateMachine = new StateMachine();
+        _stateMachine = new StateMachine(this);
 
         InitializeStates();
 
@@ -62,7 +60,14 @@ public class FsmAgentExample : MonoBehaviour
 
         if (config.enableWalk)
         {
-            _stateMachine.AddState(new FsmStateWalk(_stateMachine, agent, animationController, spriteRenderer));
+            if (!config.enableAttackRange)
+            {
+                _stateMachine.AddState(new FsmStateWalk(_stateMachine, agent, animationController, spriteRenderer));
+            }
+            else
+            {
+                _stateMachine.AddState(new FsmStateWalk(_stateMachine, agent, config.attackRangeDistance ,animationController, spriteRenderer));
+            }
         }
 
         if (config.enableAttackMelee)
@@ -73,8 +78,9 @@ public class FsmAgentExample : MonoBehaviour
 
         if (config.enableAttackRange)
         {
-            _stateMachine.AddState(new FsmStateAttackRange(_stateMachine, config.damage, config.attackCooldown,
-                animationController));
+            IProjectileFactory projectileFactory = gameObject.GetComponent<IProjectileFactory>();
+            _stateMachine.AddState(new FsmStateAttackRange(_stateMachine, config.damage, config.attackCooldown, config.attackRangeDistance,
+                animationController, config.ProjectilePrefab, projectileFactory, gameObject));
         }
     }
 
@@ -101,5 +107,11 @@ public class FsmAgentExample : MonoBehaviour
         }
 
         return allValid;
+    }
+
+    private void ChangeStateToIdle()
+    {
+        _stateMachine.SetState<FsmStateIdle>();
+        Debug.Log("Событие получения урона");
     }
 }
