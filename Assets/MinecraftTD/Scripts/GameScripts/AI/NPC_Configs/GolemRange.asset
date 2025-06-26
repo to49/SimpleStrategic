@@ -18,5 +18,5 @@ MonoBehaviour:
   enableAttackRange: 1
   damage: 1
   attackCooldown: 1
-  attackRangeDistance: 14
+  attackRangeDistance: 12
   ProjectilePrefab: {fileID: 383275271674388902, guid: df90f87a06718b24f9b1e1087f52d3b7, type: 3}

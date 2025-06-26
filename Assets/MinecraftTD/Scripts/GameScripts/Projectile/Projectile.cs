@@ -13,6 +13,7 @@ public class Projectile : MonoBehaviour
     {
         Destroy(gameObject, 3f);
     }
+
     public void Initialize(int damage, GameObject target, GameObject creator)
     {
         _damage = damage;
@@ -23,6 +24,7 @@ public class Projectile : MonoBehaviour
             _target = target.transform;
             _movementDirection = (_target.position - transform.position).normalized;
             _hasDirection = true;
+            UpdateRotation(); 
         }
         else if (!_hasDirection)
         {
@@ -30,14 +32,25 @@ public class Projectile : MonoBehaviour
             _hasDirection = true;
         }
     }
+
     private void FixedUpdate()
     {
         if (_target != null)
         {
             _movementDirection = (_target.position - transform.position).normalized;
+            UpdateRotation(); 
         }
         
         transform.position += (Vector3)_movementDirection * (_velocity * Time.fixedDeltaTime);
+    }
+
+    private void UpdateRotation()
+    {
+        if (_movementDirection != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(_movementDirection.y, _movementDirection.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -51,5 +64,4 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
 }

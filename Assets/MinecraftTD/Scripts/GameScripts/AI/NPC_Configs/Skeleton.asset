@@ -17,6 +17,6 @@ MonoBehaviour:
   enableAttackMelee: 0
   enableAttackRange: 1
   damage: 2
-  attackCooldown: 1.5
+  attackCooldown: 1.4
   attackRangeDistance: 10
   ProjectilePrefab: {fileID: 8736240391126239959, guid: 794c033c5c91c2244ba086c0386d6ceb, type: 3}
