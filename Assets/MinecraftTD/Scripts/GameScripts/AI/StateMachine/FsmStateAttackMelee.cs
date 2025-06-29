@@ -12,7 +12,7 @@ public class FsmStateAttackMelee : FsmState
     private bool methodCalled = false;
     
     public FsmStateAttackMelee(global::StateMachine stateMachine, int damage, float attackCooldown,
-        AnimationController animationController)
+        AnimationController animationController, UnityEngine.AI.NavMeshAgent agent)
         : base(stateMachine)
     {
         _attackCooldown = attackCooldown;
@@ -55,7 +55,7 @@ public class FsmStateAttackMelee : FsmState
     private void AttackTarget()
     {
         Character targetHealth = _targetGameObject.GetComponent<Character>();
-
+        
         if (targetHealth != null)
         {
             targetHealth.TakeDamage(_damage);

@@ -73,7 +73,7 @@ public class FsmAgentExample : MonoBehaviour
         if (config.enableAttackMelee)
         {
             _stateMachine.AddState(new FsmStateAttackMelee(_stateMachine, config.damage, config.attackCooldown,
-                animationController));
+                animationController, agent));
         }
 
         if (config.enableAttackRange)

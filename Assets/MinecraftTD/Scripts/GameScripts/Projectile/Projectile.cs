@@ -6,12 +6,15 @@ public class Projectile : MonoBehaviour
     private int _damage;
     private Transform _target;
     private GameObject _creator;
+    private string _creatorTag;
+    
     private Vector2 _movementDirection;
     private bool _hasDirection;
 
     private void Start()
     {
         Destroy(gameObject, 3f);
+        _creatorTag = _creator.tag;
     }
 
     public void Initialize(int damage, GameObject target, GameObject creator)
@@ -21,8 +24,7 @@ public class Projectile : MonoBehaviour
         
         if (target != null)
         {
-            _target = target.transform;
-            _movementDirection = (_target.position - transform.position).normalized;
+            _movementDirection = (target.transform.position - transform.position).normalized;
             _hasDirection = true;
             UpdateRotation(); 
         }
@@ -35,12 +37,6 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_target != null)
-        {
-            _movementDirection = (_target.position - transform.position).normalized;
-            UpdateRotation(); 
-        }
-        
         transform.position += (Vector3)_movementDirection * (_velocity * Time.fixedDeltaTime);
     }
 
@@ -55,8 +51,9 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject == _creator) return;
-        if (other.CompareTag(_creator.tag)) return;
+        if (other.CompareTag(_creatorTag)) return;
+
+        if (other.CompareTag("Player") && _creatorTag == "Friendly") return;
 
         if (other.TryGetComponent<Character>(out var character))
         {

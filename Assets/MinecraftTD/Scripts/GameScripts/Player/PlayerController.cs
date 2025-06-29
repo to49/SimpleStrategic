@@ -1,5 +1,3 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : Character
@@ -7,27 +5,21 @@ public class PlayerController : Character
     [Tooltip("Скорость движения персонажа.")]
     public float moveSpeed = 5f;
     
+    [SerializeField] private AnimationController _animationController;
     public GameObject playerModel;
+    public bool isFlipped;
     
     private Rigidbody2D rb;
+    private Vector2 moveDirection;
 
     private static PlayerController _instance;
     
-    public static PlayerController Instance
-    {
-        get
-        {
-            if (_instance != null)
-            {
-                return _instance;
-            }
-            return null;
-        }
-    }
+    public static PlayerController Instance => _instance;
 
     private void Awake()
     {
         _instance = this;
+        isFlipped = false;
     }
 
     void Start()
@@ -35,24 +27,34 @@ public class PlayerController : Character
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         float horizontalInput = Input.GetAxisRaw("Horizontal"); 
         float verticalInput = Input.GetAxisRaw("Vertical");   
         
-        Vector2 moveDirection = new Vector2(horizontalInput, verticalInput).normalized;
+        moveDirection = new Vector2(horizontalInput, verticalInput).normalized;
         
+        _animationController.animator.SetBool("IsMoving", moveDirection.magnitude > 0.1f);
         
-        rb.linearVelocity = moveDirection * moveSpeed;
-        
-        if (horizontalInput > 0)
+        if (horizontalInput > 0.1f)
         {
             playerModel.GetComponent<SpriteRenderer>().flipX = false;
+            isFlipped = false;
         }
-        else if (horizontalInput < 0)
+        else if (horizontalInput < -0.1f)
         {
             playerModel.GetComponent<SpriteRenderer>().flipX = true; 
+            isFlipped = true; 
         }
+    }
 
+    void FixedUpdate()
+    {
+        rb.AddForce(moveDirection * moveSpeed, ForceMode2D.Force);
+
+        if (rb.linearVelocity.magnitude > moveSpeed)
+        {
+            rb.linearVelocity = rb.linearVelocity.normalized * moveSpeed;
+        }
     }
 }
